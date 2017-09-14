@@ -99,11 +99,11 @@ class AuctionHouse extends PluginBase {
     public static function sendHelp($player) {
         $border = str_repeat(TF::GOLD.'='.TF::GREEN.'-', 7).TF::GOLD.'=';
         $helps = [
-            '/ah list' => 'List all current auctions.',
-            '/ah list <player>' => 'List all auctions hosted by <player>',
-            '/ah buy <auctionID>' => 'Buy an item off auction',
-            '/ah sell <price>' => 'Sell your item in hand.',
-            '/ah info <auctionID>' => 'Get detailed information of an item.'
+            '§a/ah list' => '§2List all current auctions.',
+            '§a/ah list <player>' => '§2List all auctions hosted by <player>',
+            '§a/ah buy <auctionID>' => '§2Buy an item off auction',
+            '§a/ah sell <price>' => '§2Sell your item in hand.',
+            '§a/ah info <auctionID>' => '§2Get detailed information of an item.'
         ];
         $player->sendMessage($border);
         foreach ($helps as $cmd => $desc) {
@@ -143,8 +143,8 @@ class AuctionHouse extends PluginBase {
             'price' => $price
         ];
         $this->auctions[$aucId] = $auctiondata;
-        $player->sendMessage(self::prefix().'You have successfully placed your '.$itemname.' (x'.$itemcount.') for $'.$price.' on auction.');
-        $player->sendMessage(TF::GRAY.'Your auction ID is '.TF::GREEN.$aucId.TF::GRAY.'.');
+        $player->sendMessage(self::prefix().'§bYou have successfully placed your§3 '.$itemname.' (x'.$itemcount.') for $'.$price.' §bon auction.');
+        $player->sendMessage(TF::GRAY.'§dYour auction ID is§5 '.TF::GREEN.$aucId.TF::GRAY.'.');
     }
 
     /**
@@ -184,7 +184,7 @@ class AuctionHouse extends PluginBase {
             $money = EconomyAPI::getInstance()->myMoney($player);
 
             if ($money <= $itemprice) {
-                $player->sendMessage(self::prefix(false)."You don't have enough money to buy this item.");
+                $player->sendMessage(self::prefix(false)."§4I'm sorry, but you don't have enough money to buy this item.");
                 return false;
             } else EconomyAPI::getInstance()->reduceMoney($player, $auction['price']);
 
@@ -192,13 +192,13 @@ class AuctionHouse extends PluginBase {
             EconomyAPI::getInstance()->addMoney($seller, $auction['price']);
             $item = self::constructItem($auction);
             $player->getInventory()->addItem($item);
-            $player->sendMessage(self::prefix().'You have successfully purchased the item off auction.');
+            $player->sendMessage(self::prefix().'§bYou have successfully purchased the §3item §boff auction.');
             if ($seller instanceof Player) {
-               $seller->sendMessage(self::prefix().$player->getName().' has purchased your item ('.$auction['name'].') for $'.$auction['price']);
+               $seller->sendMessage(self::prefix().$player->getName().' §6has purchased your item§e ('.$auction['name'].') for $'.$auction['price']);
             }
             unset($this->auctions[$aucId]);
         } else {
-            $player->sendMessage(self::prefix(false).'The auction with the ID ('.$aucId.') cannot be found.');
+            $player->sendMessage(self::prefix(false).'§cThe auction with the ID§4 ('.$aucId.') §ccannot be found.');
         }
     }
 
@@ -221,20 +221,20 @@ class AuctionHouse extends PluginBase {
                                 $sender->getInventory()->remove($item);
                             }
                         } else {
-                            $sender->sendMessage(TF::AQUA.'/ah sell '.TF::GRAY.'<price>'.PHP_EOL.TF::GRAY.'Put the item you are currently holding, in auction for '.TF::YELLOW.'$<price>');
+                            $sender->sendMessage(TF::AQUA.'§a/ah sell '.TF::GRAY.'<price>'.PHP_EOL.TF::GRAY.'§2Put the item you are currently holding, in auction for '.TF::YELLOW.'$<price>');
                         }
                         break;
                     case 'buy':
                         if (isset($args[1])) {
                             $this->buyAuction($args[1], $sender);
                         } else {
-                            $sender->sendMessage(TF::AQUA.'/ah buy '.TF::GRAY.'<auctionID>'.PHP_EOL.TF::GRAY.'Buy the item assigned '.TF::YELLOW.'<auctionID>'.TF::GRAY.' off auction.');
+                            $sender->sendMessage(TF::AQUA.'§a/ah buy '.TF::GRAY.'<auctionID>'.PHP_EOL.TF::GRAY.'§2Buy the item assigned '.TF::YELLOW.'<auctionID>'.TF::GRAY.' off auction.');
                         }
                         break;
                     case 'list':
                         if (!isset($args[1])) {
                             $this->sendAuctionList($sender);
-                            $sender->sendMessage(self::prefix().TF::GRAY.'Use '.TF::YELLOW.'/ah list <sellername>'.TF::GRAY.' to find item by seller, '.TF::YELLOW.'/ah info <auctionid> '.TF::GRAY.'to get more information about an item.');
+                            $sender->sendMessage(self::prefix().TF::GRAY.'Use '.TF::YELLOW.'§a/ah list <sellername>'.TF::GRAY.' §2to find item by seller, '.TF::YELLOW.'§a/ah info <auctionid> '.TF::GRAY.'§2to get more information about an item.');
                         } else {
                             if (isset($args[1])) {
                                 $expected = strtolower($args[1]);
@@ -246,7 +246,7 @@ class AuctionHouse extends PluginBase {
                                     }
                                 }
                                 if (!$none) {
-                                    $sender->sendMessage(self::prefix(false).$args[1].' does not host any auctions.');
+                                    $sender->sendMessage(self::prefix(false).$args[1].' §6does not host any auctions.');
                                 }
                             }
                         }
@@ -263,17 +263,17 @@ class AuctionHouse extends PluginBase {
 
                                 $sender->sendMessage($bb);
                                 $sender->sendMessage(TF::AQUA.'Item: '.TF::GREEN.$auc['name'].TF::DARK_GRAY.' / '.TF::GREEN.$cname[0].TF::RESET.TF::GREEN.'(x'.$auc['count'].')'.PHP_EOL.
-                                    TF::AQUA.'Used Item: '.$used.PHP_EOL.
-                                    TF::AQUA.'Enchanted: '.$enchanted.PHP_EOL.
-                                    TF::AQUA.'Cost: $'.TF::GREEN.$auc['price'].PHP_EOL.
-                                    TF::AQUA.'Seller: '.TF::GREEN.$auc['seller']);
+                                    TF::AQUA.'§aUsed Item:§2 '.$used.PHP_EOL.
+                                    TF::AQUA.'§aEnchanted:§2 '.$enchanted.PHP_EOL.
+                                    TF::AQUA.'§aCost:§2 $'.TF::GREEN.$auc['price'].PHP_EOL.
+                                    TF::AQUA.'§aSeller:§2 '.TF::GREEN.$auc['seller']);
                                 $sender->sendMessage($bb);
 
                             } else {
-                                $sender->sendMessage(self::prefix(false).'The provided auction cannot be found.');
+                                $sender->sendMessage(self::prefix(false).'§6The provided auction cannot be found.');
                             }
                         } else {
-                            $sender->sendMessage(TF::AQUA.'/ah info '.TF::GRAY.'<auctionID>');
+                            $sender->sendMessage(TF::AQUA.'§a/ah info '.TF::GRAY.'<auctionID>');
                         }
                         break;
                 }
