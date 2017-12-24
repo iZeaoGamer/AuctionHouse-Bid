@@ -104,6 +104,7 @@ class AuctionHouse extends PluginBase {
             '§a/ah buy <auctionID>' => '§2Buy an item off auction',
             '§a/ah sell <price>' => '§2Sell your item in hand.',
             '§a/ah info <auctionID>' => '§2Get detailed information of an item.'
+            return true;
         ];
         $player->sendMessage($border);
         foreach ($helps as $cmd => $desc) {
@@ -217,7 +218,6 @@ class AuctionHouse extends PluginBase {
                 switch (strtolower($args[0])) {
                     case 'help':
                         self::sendHelp($sender);
-                        return true;
                         break;
                     case 'sell':
                         if (isset($args[1])) {
