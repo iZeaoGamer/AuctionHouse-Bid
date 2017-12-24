@@ -205,7 +205,7 @@ class AuctionHouse extends PluginBase {
     /**
     * Auction commands.
     */
-    public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
+    public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args) : bool{
         if (strtolower($cmd->getName()) === 'ah') {
             if (count($args) === 0) {
                 self::sendHelp($sender);
@@ -213,16 +213,19 @@ class AuctionHouse extends PluginBase {
                 switch (strtolower($args[0])) {
                     case 'help':
                         self::sendHelp($sender);
+                        return true;
                         break;
                     case 'sell':
                         if (isset($args[1])) {
                             if (($item = $sender->getInventory()->getItemInHand())->getId() !== 0) {
                                 $this->sellAuction($sender, $item, $args[1]);
                                 $sender->getInventory()->remove($item);
+                                return true;
                             }
                         } else {
                             $sender->sendMessage(TF::AQUA.'§a/ah sell '.TF::GRAY.'<price>'.PHP_EOL.TF::GRAY.'§2Put the item you are currently holding, in auction for '.TF::YELLOW.'$<price>');
                         }
+                        return true;
                         break;
                     case 'buy':
                         if (isset($args[1])) {
@@ -230,6 +233,7 @@ class AuctionHouse extends PluginBase {
                         } else {
                             $sender->sendMessage(TF::AQUA.'§a/ah buy '.TF::GRAY.'<auctionID>'.PHP_EOL.TF::GRAY.'§2Buy the item assigned '.TF::YELLOW.'<auctionID>'.TF::GRAY.' off auction.');
                         }
+                        return true;
                         break;
                     case 'list':
                         if (!isset($args[1])) {
@@ -243,10 +247,12 @@ class AuctionHouse extends PluginBase {
                                     if ($data['seller'] == $expected) {
                                         $sender->sendMessage(TF::AQUA.'ID'.$id.'  =>  '.TF::YELLOW.$data['name'].'(x'.$data['count'].') for $'.$data['price'].' by '.TF::GREEN.$data['seller']);
                                         $none = true;
+                                        return true;
                                     }
                                 }
                                 if (!$none) {
                                     $sender->sendMessage(self::prefix(false).$args[1].' §6does not host any auctions.');
+                                    return true;
                                 }
                             }
                         }
@@ -260,6 +266,7 @@ class AuctionHouse extends PluginBase {
                                 $bb = TF::YELLOW.'[*]'.TF::DARK_GRAY.str_repeat('=', 30).TF::YELLOW.'[*]';
                                 $used = $auc['damage'] > 0 ? 'Yes' : 'No';
                                 $enchanted = isset($auc['enchant']) ? 'Yes' : 'No';
+                                return true;
 
                                 $sender->sendMessage($bb);
                                 $sender->sendMessage(TF::AQUA.'Item: '.TF::GREEN.$auc['name'].TF::DARK_GRAY.' / '.TF::GREEN.$cname[0].TF::RESET.TF::GREEN.'(x'.$auc['count'].')'.PHP_EOL.
@@ -268,12 +275,15 @@ class AuctionHouse extends PluginBase {
                                     TF::AQUA.'§aCost:§2 $'.TF::GREEN.$auc['price'].PHP_EOL.
                                     TF::AQUA.'§aSeller:§2 '.TF::GREEN.$auc['seller']);
                                 $sender->sendMessage($bb);
+                                return true;
 
                             } else {
                                 $sender->sendMessage(self::prefix(false).'§6The provided auction cannot be found.');
+                                return true;
                             }
                         } else {
                             $sender->sendMessage(TF::AQUA.'§a/ah info '.TF::GRAY.'<auctionID>');
+                            return true;
                         }
                         break;
                 }
