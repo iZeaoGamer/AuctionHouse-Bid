@@ -108,7 +108,6 @@ class AuctionHouse extends PluginBase {
         $player->sendMessage($border);
         foreach ($helps as $cmd => $desc) {
             $player->sendMessage(TF::AQUA.$cmd.' '.TF::WHITE.$desc);
-            return true;
         }
         $player->sendMessage($border);
         return true;
