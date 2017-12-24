@@ -96,7 +96,7 @@ class AuctionHouse extends PluginBase {
     * Sends '/ah help' message to $player.
     * Player $player.
     */
-    public static function sendHelp($player) {
+    public static function sendHelp(Player $player) {
         $border = str_repeat(TF::GOLD.'='.TF::GREEN.'-', 7).TF::GOLD.'=';
         $helps = [
             '§a/ah list' => '§2List all current auctions.',
@@ -110,6 +110,7 @@ class AuctionHouse extends PluginBase {
             $player->sendMessage(TF::AQUA.$cmd.' '.TF::WHITE.$desc);
         }
         $player->sendMessage($border);
+        return true;
     }
 
     /**
@@ -145,6 +146,7 @@ class AuctionHouse extends PluginBase {
         $this->auctions[$aucId] = $auctiondata;
         $player->sendMessage(self::prefix().'§bYou have successfully placed your§3 '.$itemname.' (x'.$itemcount.') for $'.$price.' §bon auction.');
         $player->sendMessage(TF::GRAY.'§dYour auction ID is§5 '.TF::GREEN.$aucId.TF::GRAY.'.');
+        return true;
     }
 
     /**
@@ -195,10 +197,12 @@ class AuctionHouse extends PluginBase {
             $player->sendMessage(self::prefix().'§bYou have successfully purchased the §3item §boff auction.');
             if ($seller instanceof Player) {
                $seller->sendMessage(self::prefix().$player->getName().' §6has purchased your item§e ('.$auction['name'].') for $'.$auction['price']);
+                return true;
             }
             unset($this->auctions[$aucId]);
         } else {
             $player->sendMessage(self::prefix(false).'§cThe auction with the ID§4 ('.$aucId.') §ccannot be found.');
+            return true;
         }
     }
 
@@ -239,6 +243,7 @@ class AuctionHouse extends PluginBase {
                         if (!isset($args[1])) {
                             $this->sendAuctionList($sender);
                             $sender->sendMessage(self::prefix().TF::GRAY.'Use '.TF::YELLOW.'§a/ah list <sellername>'.TF::GRAY.' §2to find item by seller, '.TF::YELLOW.'§a/ah info <auctionid> '.TF::GRAY.'§2to get more information about an item.');
+                            return true;
                         } else {
                             if (isset($args[1])) {
                                 $expected = strtolower($args[1]);
