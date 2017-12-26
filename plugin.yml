@@ -1,7 +1,7 @@
 name: AuctionHouse
-api: [3.0.0-ALPHA9, 3.0.0-ALPHA10]
+api: [3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11]
 main: R4KT\AuctionHouse
-version: 3.0.0-B1
+version: 3.0.0-B2
 author: VMPE Development Team
 website: Not showing.
 commands:
