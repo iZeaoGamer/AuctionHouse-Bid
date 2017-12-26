@@ -149,7 +149,6 @@ class AuctionHouse extends PluginBase {
                 $ide = $en->getId();
                 $level = $en->getLevel();
                 $ens[] = [$ide, $level];
-                return true;
             }
         } else $ens = null;
         $auctiondata = [
@@ -188,7 +187,6 @@ class AuctionHouse extends PluginBase {
                 $en = Enchantment::getEnchantment($enchant[0]);
                 $en->setLevel($enchant[1]);
                 $item->addEnchantment($en);
-                return true;
             }
         }
         return $item;
@@ -264,8 +262,8 @@ class AuctionHouse extends PluginBase {
     /**
     * Auction commands.
     */
-    public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args) : bool {
-        if (strtolower($cmd->getName()) === 'ah') {
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool {
+        if (strtolower($command->getName()) === 'ah') {
             if (count($args) === 0) {
                 self::sendHelp($sender);
                 return true;
