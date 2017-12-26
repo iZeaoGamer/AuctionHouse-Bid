@@ -1,6 +1,6 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/iZeaoGamer/AuctionHouse-Bid
 branches:
-- patch-3
+- patch-4
 projects:
   AuctionHouse-Bid:
     path: ""
