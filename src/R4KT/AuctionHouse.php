@@ -1,7 +1,7 @@
 <?php
 
 /**
-* © R4KT, Skull3x and Muqsit.
+* © R4KT, Skull3x, and Muqsit.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by
@@ -114,7 +114,7 @@ class AuctionHouse extends PluginBase {
     * Sends '/ah help' message to $player.
     * Player $player.
     */
-    public static function sendHelp($player) {
+    public static function sendHelp(Player $player) {
         $border = str_repeat(TF::GOLD.'='.TF::GREEN.'-', 7).TF::GOLD.'=';
         $helps = [
             '/ah list' => 'List all current auctions.',
@@ -128,6 +128,7 @@ class AuctionHouse extends PluginBase {
             $player->sendMessage(TF::AQUA.$cmd.' '.TF::WHITE.$desc);
         }
         $player->sendMessage($border);
+        return true;
     }
 
     /**
@@ -148,6 +149,7 @@ class AuctionHouse extends PluginBase {
                 $ide = $en->getId();
                 $level = $en->getLevel();
                 $ens[] = [$ide, $level];
+                return true;
             }
         } else $ens = null;
         $auctiondata = [
@@ -163,6 +165,7 @@ class AuctionHouse extends PluginBase {
         $this->auctions[$aucId] = $auctiondata;
         $player->sendMessage(self::prefix().'You have successfully placed your '.$itemname.' (x'.$itemcount.') for $'.$price.' on auction.');
         $player->sendMessage(TF::GRAY.'Your auction ID is '.TF::GREEN.$aucId.TF::GRAY.'.');
+        return true;
     }
 
     /**
@@ -185,6 +188,7 @@ class AuctionHouse extends PluginBase {
                 $en = Enchantment::getEnchantment($enchant[0]);
                 $en->setLevel($enchant[1]);
                 $item->addEnchantment($en);
+                return true;
             }
         }
         return $item;
@@ -195,7 +199,7 @@ class AuctionHouse extends PluginBase {
     * Auction can be traced through $aucId.
     * int $aucId, Player $player.
     */
-    public function buyAuction($aucId, $player) {
+    public function buyAuction(int $aucId, Player $player) {
         if (isset($this->auctions[$aucId])) {
             $auction = $this->auctions[$aucId];
             $itemprice = $auction['price'];
@@ -213,10 +217,12 @@ class AuctionHouse extends PluginBase {
             $player->sendMessage(self::prefix().'You have successfully purchased the item off auction.');
             if ($seller instanceof Player) {
                $seller->sendMessage(self::prefix().$player->getName().' has purchased your item ('.$auction['name'].') for $'.$auction['price']);
+               return true;
             }
             unset($this->auctions[$aucId]);
         } else {
             $player->sendMessage(self::prefix(false).'The auction with the ID ('.$aucId.') cannot be found.');
+            return true;
         }
     }
     
@@ -245,54 +251,65 @@ class AuctionHouse extends PluginBase {
             $player->sendMessage(self::prefix().'You have successfully placed a bid on that auction.');
             if ($bidder instanceof Player and $seller instanceof Player) {
                $seller->sendMessage(self::prefix().$bidder->getName().' has placed a bid of '.$biddata['amount'].' on your auction.');
+                return true;
             }
             unset($this->auctions[$aucId]);
             unset($this->bids[$bidId]);
         } else {
             $player->sendMessage(self::prefix(false).'The auction with the ID ('.$aucId.') cannot be found.');
+            return true;
         }
     }
 
     /**
     * Auction commands.
     */
-    public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
+    public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args) : bool {
         if (strtolower($cmd->getName()) === 'ah') {
             if (count($args) === 0) {
                 self::sendHelp($sender);
+                return true;
             } else {
                 switch (strtolower($args[0])) {
                     case 'help':
                         self::sendHelp($sender);
+                        return true;
                         break;
                     case 'sell':
                         if (isset($args[1])) {
                             if (($item = $sender->getInventory()->getItemInHand())->getId() !== 0) {
                                 $this->sellAuction($sender, $item, $args[1]);
                                 $sender->getInventory()->remove($item);
+                                return true;
                             }
                         } else {
                             $sender->sendMessage(TF::AQUA.'/ah sell '.TF::GRAY.'<price>'.PHP_EOL.TF::GRAY.'Put the item you are currently holding, in auction for '.TF::YELLOW.'$<price>');
+                            return true;
                         }
                         break;
                     case 'bid':
                         if (isset($args[1])) {
                                 $this->addBid($args[1], $sender);
+                            return true;
                             }
                         } else {
                             $sender->sendMessage(TF::AQUA.'/ah bid '.TF::GRAY.'<auctionID> <amount>'.PHP_EOL.TF::GRAY.'Place a bid in auction for '.TF::YELLOW.'$<amount>');
+                            return true;
                         }
                     case 'buy':
                         if (isset($args[1])) {
                             $this->buyAuction($args[1], $sender);
+                            return true;
                         } else {
                             $sender->sendMessage(TF::AQUA.'/ah buy '.TF::GRAY.'<auctionID>'.PHP_EOL.TF::GRAY.'Buy the item assigned '.TF::YELLOW.'<auctionID>'.TF::GRAY.' off auction.');
+                            return true;
                         }
                         break;
                     case 'list':
                         if (!isset($args[1])) {
                             $this->sendAuctionList($sender);
                             $sender->sendMessage(self::prefix().TF::GRAY.'Use '.TF::YELLOW.'/ah list <sellername>'.TF::GRAY.' to find item by seller, '.TF::YELLOW.'/ah info <auctionid> '.TF::GRAY.'to get more information about an item.');
+                            return true;
                         } else {
                             if (isset($args[1])) {
                                 $expected = strtolower($args[1]);
@@ -305,6 +322,7 @@ class AuctionHouse extends PluginBase {
                                 }
                                 if (!$none) {
                                     $sender->sendMessage(self::prefix(false).$args[1].' does not host any auctions.');
+                                    return true;
                                 }
                             }
                         }
@@ -326,12 +344,15 @@ class AuctionHouse extends PluginBase {
                                     TF::AQUA.'Cost: $'.TF::GREEN.$auc['price'].PHP_EOL.
                                     TF::AQUA.'Seller: '.TF::GREEN.$auc['seller']);
                                 $sender->sendMessage($bb);
+                                return true;
 
                             } else {
                                 $sender->sendMessage(self::prefix(false).'The provided auction cannot be found.');
+                                return true;
                             }
                         } else {
                             $sender->sendMessage(TF::AQUA.'/ah info '.TF::GRAY.'<auctionID>');
+                            return true;
                         }
                         break;
                 }
