@@ -61,7 +61,7 @@ class AuctionHouse extends PluginBase {
         $data = new Config($this->getDataFolder() . 'auctions.json', Config::JSON);
         $data2 = new Config($this->getDataFolder() . 'bids.json', Config::JSON);
         $files = array($data, $data2);
-        foreach ($this->auctions as $aucId => $aucData and $this->bids as $bidId => $bidData) {
+        foreach ($this->auctions as $aucId => $aucData :: $this->bids as $bidId => $bidData) {
             $data->set($aucId, $aucData);
             $data2->set($bidId, $bidData);
         }
